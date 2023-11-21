@@ -1,45 +1,54 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import MovieCard from './MovieCard';
+import SearchIcon from './search.svg';
 import './App.css';
 
-// const Person = (props) => {
-//   return (
-//     <>
-//       <h1>Name: {props.name}</h1>
-//       <h2>Last Name: {props.lastname}</h2>
-//       <h2>Age: {props.age}</h2>
-//     </>
-//   );
-// };
+const API_URL = 'http://www.omdbapi.com?apikey=b6003d8a';
 
 const App = () => {
-  // const name = 'Ishika';
-  // const isNameShowing = false;
-  const [counter, setCounter] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    alert('Reload');
-  });
-  return (
-    <div className="App">
-      {/* <h1>Hello, {isNameShowing ? name : 'someone'}!</h1>
-      <p>hello {2 + 2}!</p>
-      {name ? (
-        <h1> {name}</h1>
-      ) : (
-        <>
-          <h1>Test</h1> <h2>hi guys!</h2>
-        </>
-      )}
+    searchMovies('Batman');
+  }, []);
 
-      <Person name="Ishika" lastname="Batra" age={22} />
-      <Person name="Durgesh" lastname="Batra" age={22} /> */}
-      <button onClick={() => setCounter((prevCount) => prevCount - 1)}>
-        -
-      </button>
-      <h1>{counter}</h1>
-      <button onClick={() => setCounter((prevCount) => prevCount + 1)}>
-        +
-      </button>
+  const searchMovies = async (title) => {
+    const response = await fetch(`${API_URL}&s=${title}`);
+    const data = await response.json();
+
+    setMovies(data.Search);
+  };
+
+  return (
+    <div className="app">
+      <h1>MovieLand</h1>
+
+      <div className="search">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search for movies"
+        />
+        <img
+          src={SearchIcon}
+          alt="search"
+          onClick={() => searchMovies(searchTerm)}
+        />
+      </div>
+
+      {movies?.length > 0 ? (
+        <div className="container">
+          {movies.map((movie) => (
+            <MovieCard movie={movie} />
+          ))}
+        </div>
+      ) : (
+        <div className="empty">
+          <h2>No movies found</h2>
+        </div>
+      )}
     </div>
   );
 };
